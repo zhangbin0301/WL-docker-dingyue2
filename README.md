@@ -24,6 +24,6 @@ GH_PAT=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
 
 GH_REPO=github.com/zhangbin0301/Sub-DingYue.git
 
-SUB_NAME=Koyeb.com
+SUB_NAME=US-Koyeb.com
 
 UUID=ea4909ef-7ca6-4b46-bf2e-6c07896ef338
