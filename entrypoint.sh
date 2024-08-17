@@ -1,19 +1,9 @@
 #!/bin/bash
-if [[ "${PSWD}" == "8ge8-88888888" ]]; then
+
 # ===========================================设置相关参数=============================================
-FLIE_PATH=/app/
-if [ ! -d "${FLIE_PATH}" ]; then
-
-  mkdir -pm 777 ${FLIE_PATH}
-
-fi
-
-if [[ -n "${SPACE_HOST}" ]]; then
-  SPACE_HOST=$(echo ${SPACE_HOST} | sed 's@https://@@g')
-fi
-#设置哪吒
+FLIE_PATH="/app/"
+#设置参数
 export SUB_KEY=${NEZHA_KEY:-'key123456'}
-#哪吒其他默认参数，无需更改
 NEZHA_PORT=${NEZHA_PORT:-'443'}
 NEZHA_TLS=${NEZHA_TLS:-'1'}
 
@@ -24,7 +14,6 @@ PORT=${PORT:-'8080'}
 export UUID=${UUID:-'fd80f56e-93f3-4c85-b2a8-c77216c509a7'}
 export VPATH=${VPATH:-'vls'}
 export MPATH=${MPATH:-'vms'}
-
 export SERVER_PORT=${SERVER_PORT:-'8010'}
 if [ -n "$SPACE_HOST" ]; then
     export CF_IP=$SPACE_HOST
@@ -95,7 +84,6 @@ sed -i 's#\${NEZHA_KEY}#'"${NEZHA_KEY}"'#g' ${FLIE_PATH}nginx.conf
 sed -i 's#\${SERVER_PORT}#'"${SERVER_PORT}"'#g' ${FLIE_PATH}nginx.conf
 cp -rf ${FLIE_PATH}ADSTERTRN6456Q65525421Q3ASFDA321.html ${FLIE_PATH}${UUID}.html
 cp -rf ${FLIE_PATH}nginx.conf /etc/nginx/nginx.conf
-
 nohup nginx -g 'daemon off;' >/dev/null 2>&1 &
 }
 # 运行app
@@ -115,67 +103,9 @@ if [ -n "$SPACE_HOST" ]; then
 else
     export URL_HOST="空间网址"
 fi
-
 run_app
-
 run_nginx
-
-# ===========================================显示IP位置=============================================
-export ACCESS_TOKEN=${ACCESS_TOKEN:-'08dd8ccc089e20;47292b48b784cb'}  # 到ipinfo.io注册,多个token用;隔开
-
-commands=("curl -s https://ipinfo.io/ip" "curl -s https://api64.ipify.org?format=text" "curl -s http://whatismyip.akamai.com" "curl -s https://ifconfig.me")
-
-server_ip=""
-
-for cmd in "${commands[@]}"; do
-    server_ip=$($cmd)
-
-    # Check if IP retrieval was successful
-    if [ -n "$server_ip" ] && [[ $server_ip =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-        break  # Exit the loop if IP is successfully retrieved
-    fi
-done
-
-if [ -z "$server_ip" ] || ! [[ $server_ip =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    echo "Unable to retrieve a valid IP"
-fi
-if [[ -z "${GUOJIA}" ]]; then
-IFS=';' read -ra tokens <<< "$ACCESS_TOKEN"
-
-export country_abbreviation=""
-
-# Try free API without access token
-country_abbreviation=$(curl -s "https://ipinfo.io/${server_ip}/country")
-
-# If the free API doesn't provide a result, try with access tokens
-if [[ -z "$country_abbreviation" || ! "$country_abbreviation" =~ ^[A-Z]{2}$ ]]; then
-  for token in "${tokens[@]}"; do
-    country_abbreviation=$(curl -s "https://ipinfo.io/${server_ip}/country?token=${token}")
-
-    # Check if the obtained abbreviation is valid (two uppercase letters)
-    if [[ -n "$country_abbreviation" && "$country_abbreviation" =~ ^[A-Z]{2}$ ]]; then
-      echo "Successfully obtained valid country abbreviation using token: $country_abbreviation"
-      break  # Exit the loop if a valid abbreviation is obtained
-    else
-      echo "Token $token did not provide a valid country abbreviation."
-    fi
-  done
-fi
-if [ -z "$country_abbreviation" ] || [[ ! "$country_abbreviation" =~ ^[A-Z]{2}$ ]]; then
-ip_info=$(curl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" https://api.ip.sb/geoip)
-country_code=$(echo "$ip_info" | grep -o '"country_code":"[^"]*' | sed 's/"country_code":"//')
-country_abbreviation="$country_code"
-fi
-
-if [ -z "$country_abbreviation" ] || [[ ! "$country_abbreviation" =~ ^[A-Z]{2}$ ]]; then
-  country_abbreviation="UN"
-fi
-else
-country_abbreviation="${GUOJIA}"
-fi
-[ "$RIZHI" = "yes" ] && echo "***************************************************"
-[ "$RIZHI" = "yes" ] && echo "                                                 "
-[ "$RIZHI" = "yes" ] && echo "       IP : $server_ip   country： $country_abbreviation"
+# ===================================
 [ "$RIZHI" = "yes" ] && echo "                                                 "
 [ "$RIZHI" = "yes" ] && echo "***************************************************"
 [ "$RIZHI" = "yes" ] && echo "       ${URL_HOST}/${UUID}2 查看使用说明               "
@@ -184,12 +114,8 @@ fi
 [ "$RIZHI" = "yes" ] && echo "       ${URL_HOST}/upload-${UUID} 订阅上传地址               "
 [ "$RIZHI" = "yes" ] && echo "                                                 "
 
-[ "$RIZHI" = "yes" ] && echo "       ${URL_HOST}/sub2-${NEZHA_KEY} SUB2及自动上传订阅合订地址               "
+[ "$RIZHI" = "yes" ] && echo "       ${URL_HOST}/sub2-${NEZHA_KEY} 订阅地址               "
 [ "$RIZHI" = "yes" ] && echo "                                                 "
-if [[ -n "${SUB3}" ]]; then
-[ "$RIZHI" = "yes" ] && echo "       ${URL_HOST}/sub3-${NEZHA_KEY} SUB3合订订阅地址               "
-[ "$RIZHI" = "yes" ] && echo "                                                 "
-fi
 [ "$RIZHI" = "yes" ] && echo "       ${URL_HOST}/info 系统信息               "
 [ "$RIZHI" = "yes" ] && echo "                                                 "
 [ "$RIZHI" = "yes" ] && echo "       ${URL_HOST}/listen 监听端口               "
@@ -226,1027 +152,8 @@ if command -v ps -ef >/dev/null 2>&1; then
    fps='ps -ef'
 elif command -v pgrep -lf >/dev/null 2>&1; then
    fps='pgrep -lf'
-elif command -v ps aux >/dev/null 2>&1; then
-   fps='ps aux'
-elif command -v ss -nltp >/dev/null 2>&1; then
-   fps='ss -nltp'
-else
-   fps='0'
 fi
-if [ "$fps" != '0' ]; then
-num=$(${fps} |grep -v "grep" |wc -l)
-[ $RIZHI == "yes" ] && echo "$num"
-fi
-# ===========================================运行进程守护程序=============================================
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-#以上是全部参数设置，下面为程序处理部分
-#sed -i "s#\${SPACE_HOST}#${SPACE_HOST}#g" /app/index.html
-#sed -i "s#\${v4}#${v4}#g" /app/index.html
-#sed -i "s#\${v4l}#${v4l}#g" /app/index.html
-#sed -i "s#\${VMPATH}#${VMPATH}#g" /app/jiedian.html
-#cp -r /app/jiedian.html ${paths}/jiedian.html 
-#mv /app/index.html ${paths}/index.html
-
+#================运行进程守护程序===========
 # 检测bot
 function check_bot(){
   count=$(${fps} |grep $1 |grep -v "grep" |wc -l)
@@ -1310,33 +217,29 @@ else
 fi
 }
 
-# 定义一个函数来处理订阅地址
 process_subscription() {
     local subscription_var="$1"
     local output_file="$2"
-
     if [[ -n "${!subscription_var}" ]]; then
         local xray_subscriptions="${!subscription_var}"
         local merged_subscription=""
-
-        # 使用;分割订阅地址，然后遍历并处理它们
         IFS=";" read -ra urls <<< "$xray_subscriptions"
         for url in "${urls[@]}"
         do
-            # 检查URL是否以 "vmess://" 或 "vless://" 开头
-            if [[ "$url" == "vmess://"* || "$url" == "vless://"* || "$url" == "{PASS}://"* ]]; then
-                # 如果是以 "vmess://" 或 "vless://" 开头，则直接将URL添加到文件中，无需下载和解码
-                echo "${url}" >> "/app/tmp${output_file}"
-            else
-                # 使用curl来获取每个订阅的内容
+         if [[ "$url" == "vmess://"* ]]; then
+              if [ -n "${CF_IP1}" ]; then
+              encoded_url="${url#vmess://}"
+              decoded_url=$(echo "$encoded_url" | base64 --decode)
+               modified_url="${decoded_url//YOUXUAN_IP/$CF_IP1}"
+               modified_url="${modified_url//ip.sb/$CF_IP1}"
+               re_encoded_url=$(echo "$modified_url" | base64)
+               url="vmess://$re_encoded_url"
+               fi
+               echo "${url}" >> "/app/tmp${output_file}"
+          elif [[ "$url" == "https://"* || "$url" == "http://"* ]]; then         
                 local subscription_content=$(curl -s -m 10 "$url")
-
-                # 如果获取成功，将内容追加到合并后的订阅内容中，然后添加一个换行
                 if [ -n "$subscription_content" ]; then
-              # 解码Base64编码的内容
                 local decoded_content=$(echo -n "$subscription_content" | base64 -d)
-
-                # 检查解码后的内容是否为空
                   if [ -n "$decoded_content" ]; then
                    echo "${decoded_content}" >> "/app/tmp${output_file}"
                   else
@@ -1344,44 +247,30 @@ process_subscription() {
                   fi
                 else
                     echo "获取订阅地址 $url 内容失败"
-                fi
+                 fi
+           else         
+               echo "${url}" >> "/app/tmp${output_file}"
             fi
-
         done
-        if [ -n "${CF_IP1}" ] && [ -n "${CF_IP2}" ]; then
-            IFS=";" read -ra cf_ip2_values <<< "$CF_IP2"
-            for cf_ip2 in "${cf_ip2_values[@]}"; do
-            sed -i 's#'"${CF_IP2}"'#'"${CF_IP1}"'#g' "/app/tmp${output_file}"
-            done
-            sed -i 's#cdn.xn--b6gac.eu.org:443#'"${CF_IP1}"'#g' "/app/tmp${output_file}"
-        elif [ -n "${CF_IP1}" ] && [ -z "${CF_IP2}" ]; then
-            awk -v CF_IP1="$CF_IP1" '{gsub(/@[^@?]+\?/, "@" CF_IP1 "?")}1' "/app/tmp${output_file}" > "/app/${output_file}.new"
-            mv -f "/app/${output_file}.new" "/app/tmp${output_file}"
+        if [ -n "${CF_IP1}" ]; then
+            sed -i 's#YOUXUAN_IP#${CF_IP1}#g' "/app/tmp${output_file}"
+            sed -i 's#ip.sb#${CF_IP1}#g' "/app/tmp${output_file}"
         fi
-       if [ -n "$SPACE_HOST" ]; then
+        if [ -n "$SPACE_HOST" ]; then
         echo "${V_URL}" >> "/app/tmp${output_file}"
-
         fi
         sed -i 's/{PASS}-//g' "/app/tmp${output_file}"
-
         sed -i 's#{PASS}#vless#g' "/app/tmp${output_file}"
         # 对合并后的订阅内容进行Base64编码
         local encoded_merged_subscription=$(cat "/app/tmp${output_file}" | base64)
-
-        # 将合并后的订阅内容重定向到指定的输出文件
         echo -e "$encoded_merged_subscription" > "/app/${output_file}"
-
         rm -rf "/app/tmp${output_file}"
-
-        # 打印提示信息，表示订阅已更新
         echo "$1 订阅已更新于 $(date)"
     fi
 }
 
-
-# 定义生成随机时间的函数
 generate_random_time() {
-    local time_range=${1:-"20,120"}  # 默认时间范围为"20,120"
+    local time_range=${1:-"10,30"} 
     IFS=',' read -ra range <<< "$time_range"
     local random_time=$((RANDOM % (${range[1]} - ${range[0]} + 1) + ${range[0]}))
     echo "$random_time"
@@ -1438,13 +327,11 @@ get_sub() {
         process_cfip_yaml
         echo "CF_IP: $CF_IP1"
     }
-
     if [ -n "$GH_REPO" ]; then
         check_remote_changes
     fi
 }
 get_sub
-# 启动一个无限循环，以便定期检测订阅是否有变化
 counter=0
 while true
 do
@@ -1459,29 +346,23 @@ fi
 if [[ -z "${TOK}" && -z "${CF_DOMAIN}" ]]; then
   [ -s ${FLIE_PATH}argo.log ] && export ARGO_DOMAIN=$(cat ${FLIE_PATH}argo.log | grep -o "info.*https://.*trycloudflare.com" | sed "s@.*https://@@g" | tail -n 1)
 fi
-V_URL="{PASS}://${UUID}@${CF_IP}:443?host=${ARGO_DOMAIN}&path=%2F${VPATH}%3Fed%3D2048&type=ws&encryption=none&security=tls&sni=${ARGO_DOMAIN}#{PASS}-${country_abbreviation}-${SUB_NAME}"
+V_URL="{PASS}://${UUID}@${CF_IP}:443?host=${ARGO_DOMAIN}&path=%2F${VPATH}%3Fed%3D2048&type=ws&encryption=none&security=tls&sni=${ARGO_DOMAIN}#local"
 
 RESPONSE=$(curl -s http://localhost:${SERVER_PORT}/get-${UUID})
 
-# 检查curl请求是否成功
+
 if [ $? -ne 0 ]; then
   echo "Curl request failed. Exiting."
-  exit 1
 fi
 
-# 检查响应是否为空
+
 if [ -z "$RESPONSE" ]; then
   echo "Empty response received. Exiting."
-  exit 1
 fi
 
-# 解析JSON响应并构建SUB变量
 export SUB=$(echo "$RESPONSE" | jq -r '.urls[]' 2>/dev/null | paste -s -d ';')
-
-
 export SUB_12=""
 vars=("$SUB" "$SUB2")
-
 for var in "${vars[@]}"; do
 if [ -n "$var" ]; then
    if [ -n "$SUB_12" ]; then
@@ -1497,14 +378,9 @@ fi
 # 设置检测间隔
 interval=$(generate_random_time "$TIME")
 
-# 处理订阅2
+# 处理订阅
 process_subscription "SUB_12" "sub2.txt"
-
-# 处理订阅3
-process_subscription "SUB3" "sub3.txt"
-
-if [ "$num" -ge  "3" ] && [ "$fps" != 'ss -nltp' ]; then
-  [ -s ${FLIE_PATH}bot.js ] && [ -z "${BOT}" ] && check_bot bot.js
+[ -s ${FLIE_PATH}bot.js ] && [ -z "${BOT}" ] && check_bot bot.js
   sleep 5
   if [ -z "$SPACE_HOST" ]; then
   [ -s ${FLIE_PATH}cff.js ] && [ -n "${TOK}" ] && check_cf cff.js
@@ -1516,37 +392,8 @@ if [ "$num" -ge  "3" ] && [ "$fps" != 'ss -nltp' ]; then
   sleep 5
   check_nginx nginx
 [ "$RIZHI" = "yes" ] && echo "完成一轮检测，$interval秒后进入下一轮检测"
-
-elif [ "$num" -ge  "3" ] && [ "$fps" = 'ss -nltp' ]; then 
-  [ -s ${FLIE_PATH}bot.js ] && [ -z "${BOT}" ] && check_bot bot.js
-  sleep 5
-  if [ -z "$SPACE_HOST" ]; then
-  [ -s ${FLIE_PATH}cff.js ] && [ -n "${TOK}" ] && check_cf cff.js
-  fi
-  sleep 5
-  [ -s ${FLIE_PATH}app.js ] && check_app app.js
-  sleep 5
-  check_nginx nginx
-[ "$RIZHI" = "yes" ] && echo "完成一轮检测，$interval秒后进入下一轮检测"
-
-else
-
-[ "$RIZHI" = "yes" ] && echo "app is running"
-
-fi
-
-if [[ -n "${BAOHUO_URL}" ]]; then
-   curl -s -m 5 https://${BAOHUO_URL} >/dev/null 2>&1 &
-fi 
 if [ -z "$SPACE_HOST" ]; then
 [ -s ${FLIE_PATH}argo.log  ] && export ARGO_DOMAIN=$(cat ${FLIE_PATH}argo.log | grep -o "info.*https://.*trycloudflare.com" | sed "s@.*https://@@g" | tail -n 1)
 fi
-# 等待指定的间隔时间
 sleep "$interval"    
-
 done
-
-else
-     echo "             启动密码错误，请检查设置是否正确！                         "
-     sleep 120
-fi
