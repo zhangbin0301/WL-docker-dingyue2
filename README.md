@@ -1,6 +1,6 @@
 # docker-dingyue
 
-使用说明看运行日志
+使用说明看仓库shuoming.html
 
 最好自己制作镜像
 
