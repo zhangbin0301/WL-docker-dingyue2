@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>合并订阅地址</title>
+    <style>
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>合并多个相同格式的订阅为一个订阅地址</h1>
+
+    <table>
+        <tr>
+            <th>参数</th>
+            <th>值</th>
+        </tr>
+        <tr>
+            <td>PORT</td>
+            <td>设置端口，默认8080</td>
+        </tr>
+        <tr>
+            <td>TOK</td>
+            <td>设置隧道TOKEN</td>
+        </tr>
+        <tr>
+            <td>ARGO_DOMAIN</td>
+            <td>设置隧道域名</td>
+        </tr>
+        <tr>
+            <td>NEZHA_SERVER</td>
+            <td>哪吒服务器</td>
+        </tr>
+        <tr>
+            <td>NEZHA_KEY</td>
+            <td>哪吒密钥</td>
+        </tr>
+        <tr>
+            <td>NEZHA_PORT</td>
+            <td>哪吒端口，默认443</td>
+        </tr>
+        <tr>
+            <td>NEZHA_TLS</td>
+            <td>哪吒是否开启tls，默认开启，可设置为0关闭</td>
+        </tr>
+        <tr>
+            <td>TIME</td>
+            <td>订阅更新间隔，默认设置10,30</td>
+        </tr>
+        <tr>
+            <td>GH_PAT</td>
+            <td>GITHUB令牌</td>
+        </tr>
+        <tr>
+            <td>GH_REPO</td>
+            <td>GITHUB仓库链接，例如github.com/xx/xx.git，
+            仓库放2个文件：cfip.yaml：ip:8443，sub2.yaml：每行一个链接</td>
+        </tr>
+        <tr>
+            <td>SUB2</td>
+            <td>订阅地址或vl-ess节点链接，中间用;隔开</td>
+            
+        </tr>
+        <tr>
+            <td>UUID</td>
+            <td>UUID</td>
+        </tr>
+        <tr>
+            <td>VPATH</td>
+            <td>路径，默认'vls'</td>
+        </tr>
+
+    </table>
+</body>
+</html>
